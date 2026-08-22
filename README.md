@@ -11,25 +11,36 @@ Motivation: today's Opus-502 incident on a major provider is a normal production
 small, inspectable references for the parts an agent fleet needs before it can
 be trusted with repeated work.
 
-## What It Proves
+## What to Inspect
 
-- Provider fallback is policy, not a rescue branch hidden in application code.
-- Budget and latency targets can participate in routing before a request runs.
-- Every selection leaves a decision record: eligible models, attempted providers,
-  fallback source, cost estimate, latency, and final reason.
-- Tests use deterministic providers, so routing behavior is auditable without
-  making live network calls.
+- [`policy.py`](src/route_mini/policy.py) orders or filters declared model
+  capabilities by preference, estimated cost, or p50 latency; policies can be
+  composed.
+- [`fallback.py`](src/route_mini/fallback.py) classifies provider errors and
+  decides when to retry, fall through, or stop.
+- [`decision.py`](src/route_mini/decision.py) and
+  [`telemetry.py`](src/route_mini/telemetry.py) record selections, attempts,
+  outcomes, latency, and cost.
+- Tests and [`examples/opus_down_demo.py`](examples/opus_down_demo.py) use
+  deterministic `ScriptedProvider` instances. The core package supplies
+  provider-agnostic routing primitives and makes no live provider calls.
 
 ## Install
 
+`route-mini` is not published on PyPI. Install version `0.1.0` from the exact
+Git revision used to verify this README:
+
 ```bash
-pip install route-mini
+python -m pip install \
+  "route-mini @ git+https://github.com/JustinJLeopard/route-mini.git@826e79a7f59779853fa2845c2736bfdfa59a6ef6"
 ```
 
 For local development:
 
 ```bash
-pip install -e ".[dev]"
+git clone https://github.com/JustinJLeopard/route-mini.git
+cd route-mini
+python -m pip install -e ".[dev]"
 ```
 
 ## 30-Second Example
